@@ -2,6 +2,7 @@ package com.nweligalla.redditClone.service;
 
 
 import com.nweligalla.redditClone.dto.RegisterRequest;
+import com.nweligalla.redditClone.exception.RedditCloneException;
 import com.nweligalla.redditClone.model.EmailNotification;
 import com.nweligalla.redditClone.model.User;
 import com.nweligalla.redditClone.model.VerificationToken;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.time.Instant;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -62,4 +64,21 @@ public class AuthService {
 
         return token;
     }
+
+    //verify account from token get by email click
+    public void verifyAccount(String token) {
+        Optional<VerificationToken> verificationToken = verificationTokenRepository.findByToken(token);
+        verificationToken.orElseThrow(() -> new RedditCloneException("Invalid Token"));
+
+        fetchUserAndEnable(verificationToken.get());
+    }
+
+    @Transactional
+    private void fetchUserAndEnable(VerificationToken verificationToken) {
+        String userName = verificationToken.getUser().getUserName();
+        User user = userRepository.findByUserName(userName).orElseThrow(() -> new RedditCloneException("User not found with - " + userName));
+        user.setEnabled(true);
+        userRepository.save(user);
+    }
+
 }
