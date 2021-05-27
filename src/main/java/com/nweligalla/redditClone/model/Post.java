@@ -16,7 +16,7 @@ import static javax.persistence.GenerationType.IDENTITY;
 
 
 @Entity
-@Data// <--- generate getters and setters for class using Lombok
+@Data// <--- generate getters and setters toString for class using Lombok
 @Builder //<--- generate builder method for a class
 @AllArgsConstructor
 @NoArgsConstructor
